@@ -1,150 +1,81 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_news_app/views/pages/bookmarks_page.dart';
-import 'package:flutter_news_app/views/pages/home_page.dart';
-import 'package:flutter_news_app/views/widgets/app_bar_icon.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
-class CustomBottomNavBar extends StatefulWidget {
-  const CustomBottomNavBar({super.key});
+class CustomBottomNavbar extends StatefulWidget {
+  const CustomBottomNavbar({super.key});
 
   @override
-  State<CustomBottomNavBar> createState() => _CustomBottomNavBarState();
+  State<CustomBottomNavbar> createState() => _CustomBottomNavbarState();
 }
 
-class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
-  late PersistentTabController _controller;
+class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
+  int _currentIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = PersistentTabController(initialIndex: 0);
-  }
-
-  List<Widget> _buildScreens() {
-    return [
-      HomePage(),
-      BookmarksPage(),
-      Container(),
-    ];
-  }
-
-  List<PersistentBottomNavBarItem> _navBarsItems() {
-    return [
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.home_outlined),
-        title: "Home",
-        activeColorPrimary: Colors.blue,
-        activeColorSecondary: Colors.white,
-        inactiveColorPrimary: Colors.grey,
-        inactiveColorSecondary: Colors.purple,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.bookmark_border_outlined),
-        title: "Bookmarks",
-        activeColorPrimary: Colors.blue,
-        activeColorSecondary: Colors.white,
-        inactiveColorPrimary: Colors.grey,
-        inactiveColorSecondary: Colors.purple,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.person_outline),
-        title: "Profile",
-        activeColorPrimary: Colors.blue,
-        activeColorSecondary: Colors.white,
-        inactiveColorPrimary: Colors.grey,
-        inactiveColorSecondary: Colors.purple,
-      ),
-      // PersistentBottomNavBarItem(
-      //   icon: Icon(Icons.settings),
-      //   title: "Settings",
-      //   activeColorPrimary: Colors.indigo,
-      //   inactiveColorPrimary: Colors.grey,
-      //   routeAndNavigatorSettings: RouteAndNavigatorSettings(
-      //     initialRoute: '/',
-      //     routes: {
-      //       '/first': (context) => MainScreen2(),
-      //       '/second': (context) => MainScreen3(),
-      //     },
-      //   ),
-      // ),
-    ];
-  }
+  final List<Widget> _screens = const [
+    HomeScreen(),
+    SearchScreen(),
+    ProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: AppBarIcon(icon: Icons.menu),
-        ),
-        actions: const [
-          AppBarIcon(icon: Icons.search),
-          SizedBox(width: 6.0),
-          AppBarIcon(icon: Icons.notifications),
-          SizedBox(width: 6.0),
-        ],
-      ),
-      drawer: Drawer(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text('This is the Drawer'),
-            ],
-          ),
-        ),
-      ),
-      body: PersistentTabView(
-        context,
-        controller: _controller,
-        screens: _buildScreens(),
-        items: _navBarsItems(),
-        confineInSafeArea: true,
-        backgroundColor: Colors.white,
-        handleAndroidBackButtonPress: true,
-        resizeToAvoidBottomInset: true,
-        stateManagement: false,
-        navBarHeight: kBottomNavigationBarHeight,
-        hideNavigationBarWhenKeyboardShows: true,
-        margin: EdgeInsets.all(0.0),
-        popActionScreens: PopActionScreensType.all,
-        bottomScreenMargin: 0.0,
-        onWillPop: (context) async {
-          await showDialog(
-            context: context!,
-            useSafeArea: true,
-            builder: (context) => Container(
-              height: 50.0,
-              width: 50.0,
-              color: Colors.white,
-              child: ElevatedButton(
-                child: Text("Close"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-          );
-          return false;
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
         },
-        decoration: NavBarDecoration(
-            colorBehindNavBar: Colors.indigo,
-            borderRadius: BorderRadius.circular(20.0)),
-        popAllScreensOnTapOfSelectedTab: true,
-        itemAnimationProperties: ItemAnimationProperties(
-          duration: Duration(milliseconds: 400),
-          curve: Curves.ease,
-        ),
-        screenTransitionAnimation: ScreenTransitionAnimation(
-          animateTabTransition: true,
-          curve: Curves.ease,
-          duration: Duration(milliseconds: 200),
-        ),
-        navBarStyle:
-        NavBarStyle.style7, // Choose the nav bar style with this property
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: "Home",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: "Search",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "Profile",
+          ),
+        ],
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.white,
       ),
+    );
+  }
+}
+
+// الشاشات التجريبية
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(child: Text("Home Screen")),
+    );
+  }
+}
+
+class SearchScreen extends StatelessWidget {
+  const SearchScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(child: Text("Search Screen")),
+    );
+  }
+}
+
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(child: Text("Profile Screen")),
     );
   }
 }
