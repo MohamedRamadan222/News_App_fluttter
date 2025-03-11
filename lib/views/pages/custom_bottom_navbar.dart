@@ -1,81 +1,150 @@
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import '../widgets/app_bar_icons.dart';
+import 'home_page.dart';
 
-class CustomBottomNavbar extends StatefulWidget {
-  const CustomBottomNavbar({super.key});
+class CustomBottomNavBar extends StatefulWidget {
+  const CustomBottomNavBar({super.key});
 
   @override
-  State<CustomBottomNavbar> createState() => _CustomBottomNavbarState();
+  State<CustomBottomNavBar> createState() => _CustomBottomNavBarState();
 }
 
-class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
-  int _currentIndex = 0;
+class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
+  late PersistentTabController _controller;
 
-  final List<Widget> _screens = const [
-    HomeScreen(),
-    SearchScreen(),
-    ProfileScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _controller = PersistentTabController(initialIndex: 0);
+  }
+
+  List<Widget> _buildScreens() {
+    return [
+      HomePage(),
+      // BookmarksPage(),
+      Container(),
+      Container(),
+      Container(),
+    ];
+  }
+
+  List<PersistentBottomNavBarItem> _navBarsItems() {
+    return [
+      PersistentBottomNavBarItem(
+        icon: const Icon(Icons.home_outlined),
+        title: "Home",
+        activeColorPrimary: Colors.blue,
+        activeColorSecondary: Colors.white,
+        inactiveColorPrimary: Colors.grey,
+        inactiveColorSecondary: Colors.purple,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(Icons.bookmark_border_outlined),
+        title: "Bookmarks",
+        activeColorPrimary: Colors.blue,
+        activeColorSecondary: Colors.white,
+        inactiveColorPrimary: Colors.grey,
+        inactiveColorSecondary: Colors.purple,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(Icons.person_outline),
+        title: "Profile",
+        activeColorPrimary: Colors.blue,
+        activeColorSecondary: Colors.white,
+        inactiveColorPrimary: Colors.grey,
+        inactiveColorSecondary: Colors.purple,
+      ),
+      // PersistentBottomNavBarItem(
+      //   icon: Icon(Icons.settings),
+      //   title: "Settings",
+      //   activeColorPrimary: Colors.indigo,
+      //   inactiveColorPrimary: Colors.grey,
+      //   routeAndNavigatorSettings: RouteAndNavigatorSettings(
+      //     initialRoute: '/',
+      //     routes: {
+      //       '/first': (context) => MainScreen2(),
+      //       '/second': (context) => MainScreen3(),
+      //     },
+      //   ),
+      // ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: "Search",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "Profile",
-          ),
+      appBar: AppBar(
+        leading: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: AppBarIcons(icon: Icons.menu),
+        ),
+        actions: const [
+          AppBarIcons(icon: Icons.search),
+          SizedBox(width: 6.0),
+          AppBarIcons(icon: Icons.notifications),
+          SizedBox(width: 6.0),
         ],
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
       ),
-    );
-  }
-}
-
-// الشاشات التجريبية
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text("Home Screen")),
-    );
-  }
-}
-
-class SearchScreen extends StatelessWidget {
-  const SearchScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text("Search Screen")),
-    );
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text("Profile Screen")),
+      drawer: Drawer(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[const Text('This is the Drawer')],
+          ),
+        ),
+      ),
+      body: PersistentTabView(
+        context,
+        controller: _controller,
+        screens: _buildScreens(),
+        items: _navBarsItems(),
+        confineInSafeArea: true,
+        backgroundColor: Colors.white,
+        handleAndroidBackButtonPress: true,
+        resizeToAvoidBottomInset: true,
+        stateManagement: false,
+        navBarHeight: kBottomNavigationBarHeight,
+        hideNavigationBarWhenKeyboardShows: true,
+        margin: EdgeInsets.all(0.0),
+        popActionScreens: PopActionScreensType.all,
+        bottomScreenMargin: 0.0,
+        onWillPop: (context) async {
+          await showDialog(
+            context: context!,
+            useSafeArea: true,
+            builder:
+                (context) => Container(
+                  height: 50.0,
+                  width: 50.0,
+                  color: Colors.white,
+                  child: ElevatedButton(
+                    child: Text("Close"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+          );
+          return false;
+        },
+        decoration: NavBarDecoration(
+          colorBehindNavBar: Colors.indigo,
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        popAllScreensOnTapOfSelectedTab: true,
+        itemAnimationProperties: ItemAnimationProperties(
+          duration: Duration(milliseconds: 400),
+          curve: Curves.ease,
+        ),
+        screenTransitionAnimation: ScreenTransitionAnimation(
+          animateTabTransition: true,
+          curve: Curves.ease,
+          duration: Duration(milliseconds: 200),
+        ),
+        navBarStyle:
+            NavBarStyle.style1, // Choose the nav bar style with this property
+      ),
     );
   }
 }
