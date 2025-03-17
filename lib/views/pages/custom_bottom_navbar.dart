@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
+
 import '../widgets/app_bar_icons.dart';
 import 'home_page.dart';
 
@@ -17,58 +18,6 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
   void initState() {
     super.initState();
     _controller = PersistentTabController(initialIndex: 0);
-  }
-
-  List<Widget> _buildScreens() {
-    return [
-      HomePage(),
-      // BookmarksPage(),
-      Container(),
-      Container(),
-      Container(),
-    ];
-  }
-
-  List<PersistentBottomNavBarItem> _navBarsItems() {
-    return [
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.home_outlined),
-        title: "Home",
-        activeColorPrimary: Colors.blue,
-        activeColorSecondary: Colors.white,
-        inactiveColorPrimary: Colors.grey,
-        inactiveColorSecondary: Colors.purple,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.bookmark_border_outlined),
-        title: "Bookmarks",
-        activeColorPrimary: Colors.blue,
-        activeColorSecondary: Colors.white,
-        inactiveColorPrimary: Colors.grey,
-        inactiveColorSecondary: Colors.purple,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(Icons.person_outline),
-        title: "Profile",
-        activeColorPrimary: Colors.blue,
-        activeColorSecondary: Colors.white,
-        inactiveColorPrimary: Colors.grey,
-        inactiveColorSecondary: Colors.purple,
-      ),
-      // PersistentBottomNavBarItem(
-      //   icon: Icon(Icons.settings),
-      //   title: "Settings",
-      //   activeColorPrimary: Colors.indigo,
-      //   inactiveColorPrimary: Colors.grey,
-      //   routeAndNavigatorSettings: RouteAndNavigatorSettings(
-      //     initialRoute: '/',
-      //     routes: {
-      //       '/first': (context) => MainScreen2(),
-      //       '/second': (context) => MainScreen3(),
-      //     },
-      //   ),
-      // ),
-    ];
   }
 
   @override
@@ -95,55 +44,71 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
         ),
       ),
       body: PersistentTabView(
-        context,
         controller: _controller,
-        screens: _buildScreens(),
-        items: _navBarsItems(),
-        confineInSafeArea: true,
+        tabs: [
+          PersistentTabConfig(
+            screen: const HomePage(),
+            item: ItemConfig(
+              icon: const Icon(Icons.home_outlined),
+              title: "Home",
+              activeForegroundColor: Colors.blue,
+              inactiveForegroundColor: Colors.grey,
+            ),
+          ),
+          PersistentTabConfig(
+            screen: Container(),
+            item: ItemConfig(
+              icon: const Icon(Icons.bookmark_border_outlined),
+              title: "Bookmarks",
+              activeForegroundColor: Colors.blue,
+              inactiveForegroundColor: Colors.grey,
+            ),
+          ),
+          PersistentTabConfig(
+            screen: Container(),
+            item: ItemConfig(
+              icon: const Icon(Icons.person_outline),
+              title: "Profile",
+              activeForegroundColor: Colors.blue,
+              inactiveForegroundColor: Colors.grey,
+            ),
+          ),
+        ],
+        navBarBuilder: (navBarConfig) => Style1BottomNavBar(
+          navBarConfig: navBarConfig,
+          navBarDecoration: NavBarDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+        ),
         backgroundColor: Colors.white,
         handleAndroidBackButtonPress: true,
         resizeToAvoidBottomInset: true,
         stateManagement: false,
         navBarHeight: kBottomNavigationBarHeight,
-        hideNavigationBarWhenKeyboardShows: true,
-        margin: EdgeInsets.all(0.0),
+        margin: const EdgeInsets.all(0.0),
         popActionScreens: PopActionScreensType.all,
-        bottomScreenMargin: 0.0,
         onWillPop: (context) async {
           await showDialog(
-            context: context!,
+            context: context,
             useSafeArea: true,
-            builder:
-                (context) => Container(
-                  height: 50.0,
-                  width: 50.0,
-                  color: Colors.white,
-                  child: ElevatedButton(
-                    child: Text("Close"),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
+            builder: (context) => Container(
+              height: 50.0,
+              width: 50.0,
+              color: Colors.white,
+              child: ElevatedButton(
+                child: const Text("Close"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
           );
           return false;
         },
-        decoration: NavBarDecoration(
-          colorBehindNavBar: Colors.indigo,
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-        popAllScreensOnTapOfSelectedTab: true,
-        itemAnimationProperties: ItemAnimationProperties(
-          duration: Duration(milliseconds: 400),
-          curve: Curves.ease,
-        ),
-        screenTransitionAnimation: ScreenTransitionAnimation(
-          animateTabTransition: true,
+        screenTransitionAnimation: const ScreenTransitionAnimation(
           curve: Curves.ease,
           duration: Duration(milliseconds: 200),
         ),
-        navBarStyle:
-            NavBarStyle.style1, // Choose the nav bar style with this property
       ),
     );
   }
